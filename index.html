@@ -246,6 +246,42 @@ body{
   color:#666;
   margin-bottom:5px;
 }
+.close-modal{
+  display:flex;
+  justify-content:flex-end;
+  cursor:pointer;
+  font-size:20px;
+  margin-bottom:10px;
+  color:#666;
+}
+
+.close-modal:hover{
+  color:#F44336;
+}
+.actions{
+  display:flex;
+  flex-direction:column;
+  align-items:end;
+  gap:10px;
+}
+
+.delete-btn{
+  border:none;
+  background:#ffe5e5;
+  color:#d32f2f;
+  padding:8px 14px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:600;
+  transition:0.3s;
+}
+
+.delete-btn:hover{
+  background:#f44336;
+  color:white;
+  transform:scale(1.05);
+}
 </style>
 </head>
 
@@ -316,26 +352,29 @@ body{
 
 <!-- MODAL -->
 <div class="modal" id="modal">
-    <div class="modal-content">
-  
-      <h2>Adicionar Produto</h2>
-  
-      <div class="input-group">
-        <input type="text" id="productName" placeholder="Nome do produto">
-      </div>
-  
-      <div class="input-group">
-        <input type="date" id="productDate">
-      </div>
-  
-      <!-- Campo de status removido -->
-  
-      <button class="save-btn" onclick="addProduct()">
-        Salvar
-      </button>
-  
+  <div class="modal-content">
+
+    <!-- BOTÃO FECHAR -->
+    <div class="close-modal" onclick="closeModal()">
+      ✖
     </div>
+
+    <h2>Adicionar Produto</h2>
+
+    <div class="input-group">
+      <input type="text" id="productName" placeholder="Nome do produto">
+    </div>
+
+    <div class="input-group">
+      <input type="date" id="productDate">
+    </div>
+
+    <button class="save-btn" onclick="addProduct()">
+      Salvar
+    </button>
+
   </div>
+</div>
 
 <script>
 
@@ -351,29 +390,31 @@ let products = [
   {name:"Brócolis", date:"2026-06-09", status:"green", emoji:"🥦"}
 ];
 
-function renderProducts(){
+function renderProducts() {
 
-  productList.innerHTML = "";
+productList.innerHTML = "";
 
-  products.forEach(prod => {
+products.forEach((prod, index) => {
 
-    const card = document.createElement("div");
+  const card = document.createElement("div");
 
-    card.className = "product-card";
+  card.className = "product-card";
 
-    card.innerHTML = `
-      <div class="product-info">
+  card.innerHTML = `
+    <div class="product-info">
 
-        <div class="icon ${prod.status}">
-          ${prod.emoji}
-        </div>
-
-        <div class="product-text">
-          <h3>${prod.name}</h3>
-          <p>Validade: ${prod.date}</p>
-        </div>
-
+      <div class="icon ${prod.status}">
+        ${prod.emoji}
       </div>
+
+      <div class="product-text">
+        <h3>${prod.name}</h3>
+        <p>Validade: ${prod.date}</p>
+      </div>
+
+    </div>
+
+    <div class="actions">
 
       <div class="status"
         style="color:
@@ -386,11 +427,39 @@ function renderProducts(){
         'Vencido'}
 
       </div>
-    `;
 
-    productList.appendChild(card);
-  });
+      <button
+        class="delete-btn"
+        onclick="deleteProduct(${index})"
+      >
+        ✕ Remover
+      </button>
 
+    </div>
+  `;
+
+  productList.appendChild(card);
+
+});
+
+}
+
+
+// FUNÇÃO EXCLUIR
+function deleteProduct(index) {
+
+const confirmDelete = confirm(
+  "Deseja remover este produto da despensa?"
+);
+
+if (confirmDelete) {
+
+  products.splice(index, 1);
+
+  renderProducts();
+  renderUrgentIngredients();
+
+}
 }
 
 function getEmoji(food){
@@ -562,3 +631,4 @@ renderUrgentIngredients();
 <script src="script.js"></script>
 
 </html>
+
