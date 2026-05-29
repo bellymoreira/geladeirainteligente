@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DESPENSA ZERO</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family: Arial, sans-serif;}
+    body{background:#f4f6f8;display:flex;justify-content:center;align-items:flex-start;padding:20px;}
+    .app{width:360px;background:white;border-radius:25px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.15);position:relative;}
+    .header{background:#4CAF50;color:white;padding:25px;}
+    .header h1{font-size:24px;}
+    .header p{margin-top:5px;opacity:0.9;}
+    .status-card{background:#66bb6a;margin:20px;padding:20px;border-radius:20px;color:white;}
+    .progress{width:100%;height:10px;background:rgba(255,255,255,0.3);border-radius:10px;margin:15px 0;overflow:hidden;}
+    .progress-bar{width:70%;height:100%;background:white;}
+    .section-title{padding:0 20px;margin-bottom:10px;font-size:20px;font-weight:bold;color:#333;}
+    .product-list{padding:0 20px 90px; max-height:400px; overflow-y:auto;}
+    .product-card{background:white;border-radius:15px;padding:15px;margin-bottom:15px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.08);}
+    .product-info{display:flex;align-items:center;gap:15px;}
+    .icon{width:50px;height:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;color:white;font-size:22px;}
+    .green{background:#4CAF50;}
+    .yellow{background:#FFC107;}
+    .red{background:#F44336;}
+    .product-text h3{font-size:16px;color:#333;}
+    .product-text p{font-size:13px;color:#777;}
+    .status{font-weight:bold;font-size:14px;}
+    .fab{position:absolute;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;border:none;background:#4CAF50;color:white;font-size:30px;cursor:pointer;box-shadow:0 5px 15px rgba(0,0,0,0.2);transition:0.2s;}
+    .fab:hover{transform:scale(1.05);}
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;justify-content:center;align-items:center;}
+    .modal-content{background:white;width:320px;padding:25px;border-radius:20px;}
+    .modal-content h2{margin-bottom:20px;}
+    .input-group{margin-bottom:15px;}
+    .input-group input{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;}
+    .save-btn{width:100%;padding:14px;background:#4CAF50;color:white;border:none;border-radius:12px;font-size:16px;cursor:pointer;}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>DESPENSA ZERO</h1>
+      <p>Controle sua validade e evite desperdícios</p>
+    </div>
+    <div class="status-card">
+      <h2>Status da Despensa</h2>
+      <div class="progress"><div class="progress-bar"></div></div>
+      <p>70% dos produtos estão OK</p>
+    </div>
+    <div class="section-title">Produtos</div>
+    <div class="product-list" id="productList"></div>
+    <button class="fab" onclick="openModal()">+</button>
+  </div>
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">✖</span>
+      <h2>Adicionar Produto</h2>
+      <div class="input-group">
+        <input type="text" id="productName" placeholder="Nome do produto">
+      </div>
+      <div class="input-group">
+        <input type="date" id="productDate">
+      </div>
+      <div class="input-group">
+        <select id="productStatus">
+          <option value="green">OK</option>
+          <option value="yellow">Quase vencendo</option>
+          <option value="red">Vencido</option>
+        </select>
+      </div>
+      <button class="save-btn" onclick="addProduct()">Salvar</button>
+    </div>
+  </div>
+  <script>
+    const productList = document.getElementById("productList");
+    const modal = document.getElementById("modal");
+    // Produtos iniciais
+    let products = [
+      {name:"Leite", date:"2026-06-05", status:"yellow", emoji:"🥛"},
+      {name:"Pão", date:"2026-06-04", status:"red", emoji:"🍞"},
+      {name:"Brócolis", date:"2026-06-07", status:"green", emoji:"🥦"},
+      {name:"Queijo", date:"2026-06-06", status:"yellow", emoji:"🧀"},
+      {name:"Iogurte", date:"2026-06-08", status:"green", emoji:"🥛"},
+      {name:"Tomate", date:"2026-06-07", status:"green", emoji:"🍅"},
+      {name:"Ovos", date:"2026-06-09", status:"green", emoji:"🥚"},
+      {name:"Manteiga", date:"2026-06-10", status:"green", emoji:"🧈"},
+    ];
+    function renderProducts() {
+      productList.innerHTML = "";
+      products.forEach(prod => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-info">
+            <div class="icon ${prod.status}">${prod.emoji}</div>
+            <div class="product-text">
+              <h3>${prod.name}</h3>
+              <p>Validade: ${prod.date}</p>
+            </div>
+          </div>
+          <div class="status" style="color:${prod.status==='green'?'#4CAF50':prod.status==='yellow'?'#FFC107':'#F44336'};">
+            ${prod.status==='green'?'OK':prod.status==='yellow'?'Quase vencendo':'Vencido'}
+          </div>
+        `;
+        productList.appendChild(card);
+      });
+    }
+    function openModal() {
+      modal.style.display = "flex";
+    }
+    function closeModal() {
+      modal.style.display = "none";
+      document.getElementById("productName").value = "";
+      document.getElementById("productDate").value = "";
+      document.getElementById("productStatus").value = "green";
+    }
+    function addProduct() {
+      const name = document.getElementById("productName").value;
+      const date = document.getElementById("productDate").value;
+      const status = document.getElementById("productStatus").value;
+      if(name && date){
+        products.push({
+          name:name,
+          date:date,
+          status:status,
+          emoji: status==='green' ? "🥦" : status==='yellow' ? "🧀" : "🍞"
+        });
+        renderProducts();
+        closeModal();
+      } else {
+        alert("Preencha nome e data do produto!");
+      }
+    }
+    renderProducts();
+  </script>
+</body>
+</html>
